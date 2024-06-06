@@ -33,7 +33,6 @@ namespace Server_API.Controllers
                 //02 Apaga arquivo antigo se existir
                 System.IO.File.Delete(statementFilePath);
 
-
                 //03 Cria arquivo no servidor
                 using (var stream = new FileStream(statementFilePath, FileMode.Create))
                 {
@@ -82,19 +81,21 @@ namespace Server_API.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Download a file.", typeof(FileContentResult))]
         public IActionResult ProcessFile()
         {
+            
             var statementFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "original", "original.csv");
             var expenseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "expenses", "expenses.csv");
             var finalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "final");
 
+
             if (System.IO.File.Exists(statementFilePath) && System.IO.File.Exists(expenseFilePath))
             {
-
                 //01 normaliza IO
                 if (!Directory.Exists(finalFilePath))
                 {
                     Directory.CreateDirectory(finalFilePath);
                 }
-                else {
+                else
+                {
                     //apaga arquivos antigos
                     System.IO.DirectoryInfo finalDirectory = new System.IO.DirectoryInfo(finalFilePath);
                     foreach (System.IO.FileInfo file in finalDirectory.GetFiles()) file.Delete();
