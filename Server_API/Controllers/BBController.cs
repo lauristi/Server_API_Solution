@@ -5,20 +5,20 @@ using System.Net;
 
 namespace Server_API.Controllers
 {
-    public class StatementController : Controller
+    public class BBController : Controller
     {
-        private readonly ILogger<ClipboardController> _logger;
-        private readonly IBankStatementService _bankStatementService;
+        private readonly ILogger<BBController> _logger;
+        private readonly IBBService _BBService;
 
-        public StatementController(IBankStatementService bankStatementService,
-                                   ILogger<ClipboardController> logger)
+        public BBController(IBBService BBService,
+                               ILogger<BBController> logger)
         {
-            _bankStatementService = bankStatementService;
+            _BBService = BBService;
             _logger = logger;
         }
 
         [HttpPost]
-        [Route("api/bank/uploadStatement")]
+        [Route("api/bb/uploadStatement")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Download a file.", typeof(FileContentResult))]
         public async Task<IActionResult> UploadStatement(IFormFile file)
         {
@@ -26,11 +26,13 @@ namespace Server_API.Controllers
             {
                 //01 Normaliza IO
                 var statementFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "original");
+
                 if (!Directory.Exists(statementFilePath)) Directory.CreateDirectory(statementFilePath);
                 statementFilePath = Path.Combine(statementFilePath, "original.csv");
 
                 //02 Apaga arquivo antigo se existir
                 System.IO.File.Delete(statementFilePath);
+
 
                 //03 Cria arquivo no servidor
                 using (var stream = new FileStream(statementFilePath, FileMode.Create))
@@ -47,7 +49,7 @@ namespace Server_API.Controllers
         }
 
         [HttpPost]
-        [Route("api/bank/uploadExpenses")]
+        [Route("api/bb/uploadExpenses")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Download a file.", typeof(FileContentResult))]
         public async Task<IActionResult> UploadExpenses(IFormFile file)
         {
@@ -86,12 +88,21 @@ namespace Server_API.Controllers
 
             if (System.IO.File.Exists(statementFilePath) && System.IO.File.Exists(expenseFilePath))
             {
-                //01 Apaga arquivo antigo
-                System.IO.DirectoryInfo finalDirectory = new System.IO.DirectoryInfo(finalFilePath);
-                foreach (System.IO.FileInfo file in finalDirectory.GetFiles()) file.Delete();
 
-                //02 Processa dados da Origem
-                finalFilePath = _bankStatementService.ProcessBankStatement(statementFilePath, expenseFilePath, finalFilePath);
+                //01 normaliza IO
+                if (!Directory.Exists(finalFilePath))
+                {
+                    Directory.CreateDirectory(finalFilePath);
+                }
+                else {
+                    //apaga arquivos antigos
+                    System.IO.DirectoryInfo finalDirectory = new System.IO.DirectoryInfo(finalFilePath);
+                    foreach (System.IO.FileInfo file in finalDirectory.GetFiles()) file.Delete();
+                }
+
+
+                //02 Processa dados da Origem e disponibiliza arquivo para download
+                finalFilePath = _BBService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
 
                 if (string.IsNullOrEmpty(finalFilePath))
                 {

@@ -23,7 +23,7 @@ if (!builder.Environment.IsDevelopment())
 //==============================================================================================
 
 // Add services to the container.
-builder.Services.AddScoped<IBankStatementService, BankStatementService>();
+builder.Services.AddScoped<IBBService, BBService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

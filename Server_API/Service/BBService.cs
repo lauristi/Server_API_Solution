@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Server_API.Service
 {
-    public class BankStatementService : IBankStatementService
+    public class BBService : IBBService
     {
         public string ConvertCsvToXls(string csvFilePath, string xlsFilePath)
         {
@@ -46,7 +46,7 @@ namespace Server_API.Service
             return xlsFilePath;
         }
 
-        public string? ProcessBankStatement(string statementFilePath, string expenseFilePath, string finalFilePath)
+        public string? ProcessStatment(string statementFilePath, string expenseFilePath, string finalFilePath)
         {
             try
             {
@@ -85,9 +85,12 @@ namespace Server_API.Service
                         statementData.Date = aItem[0];
                         statementData.Subject = aItem[2].ToUpper();
                         statementData.Value = NormalizeValue(aItem[5]);
-                        statementData.Type = ProcessSubject(statementData.Subject, statementData.Value, expenses);
                         statementData.Score = ExpenseAnalysis(statementData.Value);
+                        statementData.IsCredit = !aItem[5].Contains("-");
+
+                        statementData.Type = ProcessSubject(statementData, expenses);
                         //------------------------------------------------------
+
                         if (string.IsNullOrEmpty(xlsName))
                         {
                             //csvName = CreateArchiveName(statementData.Date, "csv");
@@ -159,22 +162,25 @@ namespace Server_API.Service
             }
         }
 
-        private string? ProcessSubject(string subject, string value, List<Expense> expenses)
+        private string? ProcessSubject(StatementData statementData, List<Expense> expenses)
         {
             // Procura na lista de despesas o primeiro elemento que corresponde à condição
             // Verifica se o campo Origin da despesa não é nulo
             // Verifica se o campo Origin da despesa está contido na string subject, ignorando maiúsculas e minúsculas
             // Se encontrar um elemento que corresponde à condição, retorna o valor do campo Owner da despesa correspondente
 
-            var found = expenses.FirstOrDefault(e => e.Origin != null
-                                                && subject.IndexOf(e.Origin, StringComparison.OrdinalIgnoreCase) >= 0);
-            var result = found?.Owner;
+            string? result = null;
+            if (statementData.Subject != null)
+            {
+                var found = expenses.FirstOrDefault(e => e.Origin != null
+                                                    && statementData.Subject.IndexOf(e.Origin, StringComparison.OrdinalIgnoreCase) >= 0);
+                result = found?.Owner;
 
-            //if (!string.IsNullOrEmpty(result))
-            //{
-            //    result = NormalizeStringSize(result, 20);
-            //    result = $"{result}{ExpenseAnalysis(value)}";
-            //}
+                if (result == ""  && statementData.IsCredit)
+                {
+                    result = "XXX - Credito";
+                }
+            }
 
             return result;
         }
@@ -260,13 +266,20 @@ namespace Server_API.Service
                         worksheet.Cells[row, 4].Value = field.Type;
                         worksheet.Cells[row, 5].Value = field.Score;
 
+                        // Assegurar que o valor na coluna 3 seja numérico
+                        worksheet.Cells[row, 3].Value = 0;
+                        if (double.TryParse(field.Value.ToString(), out double numericValue))
+                        {
+                            worksheet.Cells[row, 3].Value = numericValue;
+                        }
+
                         row++;
                     }
 
-                    // Definir formato da coluna 3 como moeda sem o símbolo de moeda
-                    // linha inicial,coluna inicial, linha(s) finais, coluna final
-                    //var colC = worksheet.Cells[1, 3, row - 1, 3];
-                    //colC.Style.Numberformat.Format = "0.00";
+                    // Definir formato da coluna 3 como moeda brasileira sem o símbolo de moeda
+                    // linha inicial, coluna inicial, linha(s) finais, coluna final
+                    var colC = worksheet.Cells[1, 3, row - 1, 3];
+                    colC.Style.Numberformat.Format = "#,##0.00"; // Formato sem símbolo de moeda
 
                     package.Save();
                     return true;
@@ -311,6 +324,9 @@ namespace Server_API.Service
                                                                  DateTimeStyles.None,
                                                                  out DateTime dateTime))
             {
+                //A Primeira linha é os Saldo do mês anterior.
+                dateTime = dateTime.AddMonths(1);
+
                 return $"{dateTime.Month:00}-{dateTime.ToString("MMMM").ToUpper()}-{dateTime.ToString("yyyy")}.{extension}";
             }
 

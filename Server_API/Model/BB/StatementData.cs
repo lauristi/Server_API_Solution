@@ -7,6 +7,7 @@
         public String? Value { get; set; }
         public String? Type { get; set; }
         public String? Score { get; set; }
+        public bool IsCredit { get; set; }
 
         public string LineCSV()
         {
