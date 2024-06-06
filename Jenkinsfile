@@ -10,7 +10,7 @@ pipeline {
         PROJECT_PATH_ARCHIVE = 'Server_API/Server_API.csproj'
         PUBLISH_PATH = 'Server_API/bin/Release/net8.0/publish'
         ARTIFACT_PATH = 'Server_API/Artifact'
-        DEPLOY_PATH = '/var/www/app/ServerClipboardProjects/Server_API'
+        DEPLOY_PATH = '/var/www/app/ServerProjects/Server_API'
         DOTNET_ROOT = '/opt/dotnet'
     }
 
