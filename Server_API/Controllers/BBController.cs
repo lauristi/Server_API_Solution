@@ -100,7 +100,6 @@ namespace Server_API.Controllers
                     foreach (System.IO.FileInfo file in finalDirectory.GetFiles()) file.Delete();
                 }
 
-
                 //02 Processa dados da Origem e disponibiliza arquivo para download
                 finalFilePath = _BBService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
 
