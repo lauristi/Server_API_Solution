@@ -78,7 +78,7 @@ namespace Server_API.Controllers
         }
 
         [HttpGet]
-        [Route("api/bank/processFile")]
+        [Route("api/bb/processFile")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Download a file.", typeof(FileContentResult))]
         public IActionResult ProcessFile()
         {
