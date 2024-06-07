@@ -11,6 +11,7 @@
 
         //Evita aviso chato de null
         private string? _value;
+
         public string Value
         {
             get => _value ?? "0";

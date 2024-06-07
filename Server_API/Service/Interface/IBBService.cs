@@ -7,6 +7,5 @@
         string ConvertCsvToXls(string csvFilePath, string xlsFilePath);
 
         decimal ProcessMonthSpending(string statementFilePath);
-    }       
-        
+    }
 }

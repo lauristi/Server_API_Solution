@@ -128,7 +128,7 @@ namespace Server_API.Controllers
             {
                 return BadRequest("Arquivos necessários não encontrados");
             }
-            
+
             Spending spending = new Spending();
             spending.Value = _BBService.ProcessMonthSpending(statementFilePath);
 

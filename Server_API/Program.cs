@@ -62,8 +62,8 @@ app.UseRequestLocalization(localizationOptions);
 
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 //}
 
 //REMOVIDO PRA EVITAR ERRO DO CORS

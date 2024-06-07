@@ -3,7 +3,6 @@ using Server_API.Model;
 using Server_API.Service.Interface;
 using System.Globalization;
 using System.Text;
-using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Server_API.Service
 {
@@ -145,20 +144,31 @@ namespace Server_API.Service
                     string cleanLine = line.Replace("\"", "");
                     string[] aItem = cleanLine.Split(',');
 
-                    if (aItem[5].Contains("-"))
-                    {
-                        decimal NormalizedValue = NormalizeToDecimal(aItem[5]);
+                    string subject = aItem[2].ToUpper();
+                    string grossValue = aItem[5].ToUpper();
 
-                        //trava especial por causa das aplicações
-                        if (NormalizedValue < 10000.00m) {
-                            totalSpending = totalSpending + NormalizedValue;
+                    //alguns items negativos devem ser ignorados
+                    List<string> terms = new List<string> {"Aplicação",
+                                                           "Ágil",
+                                                           "Transferido"};
+
+                    bool devolvido = terms.Any(termo => subject.Contains("DEVOLVIDO"));
+                    bool aplicacao = terms.Any(termo => subject.Contains(termo.ToUpper()));
+
+                    if (devolvido)
+                    {
+                        totalSpending = totalSpending - NormalizeToDecimal(grossValue);
+                    }
+                    else
+                    {
+                        if (grossValue.Contains("-") && !aplicacao)
+                        {
+                            totalSpending = totalSpending + NormalizeToDecimal(grossValue);
                         }
-                        
                     }
                 }
                 cabecalho++;
             }
-
             return totalSpending;
         }
 
@@ -308,7 +318,6 @@ namespace Server_API.Service
                         worksheet.Cells[row, 4].Value = field.Type;
                         worksheet.Cells[row, 5].Value = field.Score;
 
-                        
                         if (double.TryParse(field.Value.ToString(), out double numericValue))
                         {
                             worksheet.Cells[row, 3].Value = numericValue;
