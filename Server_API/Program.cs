@@ -1,7 +1,9 @@
 using EncryptionLib;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Server_API.Service;
 using Server_API.Service.Interface;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,12 +43,27 @@ builder.Services.AddSingleton<ICrypto, CryptoClass>();
 
 var app = builder.Build();
 
+//Determinando o uso de Pt-br para a App
+var supportedCultures = new[] { new CultureInfo("pt-BR") };
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("pt-BR"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+//Garatir que seja usado em todas as threads
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
+
+app.UseRequestLocalization(localizationOptions);
+
 // Configure the HTTP request pipeline.
 
 //if (app.Environment.IsDevelopment())
 //{
-app.UseSwagger();
-app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 //}
 
 //REMOVIDO PRA EVITAR ERRO DO CORS
