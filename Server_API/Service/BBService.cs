@@ -3,6 +3,7 @@ using Server_API.Model;
 using Server_API.Service.Interface;
 using System.Globalization;
 using System.Text;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Server_API.Service
 {
@@ -56,7 +57,7 @@ namespace Server_API.Service
                 //02 CARREGO OS DADOS DO EXTRATO
                 List<StatementData> statementDatas = new List<StatementData>();
 
-                string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1); ;
+                string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1);
 
                 int cabecalho = 0;
                 //string csvName = null;
@@ -130,6 +131,37 @@ namespace Server_API.Service
             }
         }
 
+        public decimal ProcessMonthSpending(string statementFilePath)
+        {
+            string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1);
+
+            int cabecalho = 0;
+            decimal totalSpending = 0.0m;
+
+            foreach (string line in lines)
+            {
+                if (cabecalho > 0)
+                {
+                    string cleanLine = line.Replace("\"", "");
+                    string[] aItem = cleanLine.Split(',');
+
+                    if (aItem[5].Contains("-"))
+                    {
+                        decimal NormalizedValue = NormalizeToDecimal(aItem[5]);
+
+                        //trava especial por causa das aplicações
+                        if (NormalizedValue < 10000.00m) {
+                            totalSpending = totalSpending + NormalizedValue;
+                        }
+                        
+                    }
+                }
+                cabecalho++;
+            }
+
+            return totalSpending;
+        }
+
         #region "Private functions"
 
         private List<Expense> LoadConversions(string convertionFile)
@@ -176,7 +208,7 @@ namespace Server_API.Service
                                                     && statementData.Subject.IndexOf(e.Origin, StringComparison.OrdinalIgnoreCase) >= 0);
                 result = found?.Owner;
 
-                if (result == ""  && statementData.IsCredit)
+                if (result == "" && statementData.IsCredit)
                 {
                     result = "XXX - Credito";
                 }
@@ -224,6 +256,16 @@ namespace Server_API.Service
             return normalizedValue;
         }
 
+        private decimal NormalizeToDecimal(string value)
+        {
+            if (decimal.TryParse(value.Replace(".", ",")
+                                      .Replace("-", ""), out decimal decimalValue))
+            {
+                return decimalValue;
+            }
+            return 0.0m;
+        }
+
         private bool CreateNewFileCSV(string finalFilePath, List<StatementData> statementData)
         {
             // CRIA NOVO ARQUIVO
@@ -262,12 +304,11 @@ namespace Server_API.Service
                     {
                         worksheet.Cells[row, 1].Value = field.Date;
                         worksheet.Cells[row, 2].Value = field.Subject;
-                        worksheet.Cells[row, 3].Value = field.Value;
+                        worksheet.Cells[row, 3].Value = NormalizeToDecimal(field.Value);
                         worksheet.Cells[row, 4].Value = field.Type;
                         worksheet.Cells[row, 5].Value = field.Score;
 
-                        // Assegurar que o valor na coluna 3 seja numérico
-                        worksheet.Cells[row, 3].Value = 0;
+                        
                         if (double.TryParse(field.Value.ToString(), out double numericValue))
                         {
                             worksheet.Cells[row, 3].Value = numericValue;

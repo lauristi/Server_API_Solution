@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Server_API.Model.BB;
 using Server_API.Service.Interface;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -81,11 +82,9 @@ namespace Server_API.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Download a file.", typeof(FileContentResult))]
         public IActionResult ProcessFile()
         {
-            
             var statementFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "original", "original.csv");
             var expenseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "expenses", "expenses.csv");
             var finalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "final");
-
 
             if (System.IO.File.Exists(statementFilePath) && System.IO.File.Exists(expenseFilePath))
             {
@@ -117,6 +116,23 @@ namespace Server_API.Controllers
             {
                 return BadRequest("Arquivos necessários não encontrados");
             }
+        }
+
+        [HttpGet]
+        [Route("api/bb/spending")]
+        public IActionResult GetSpending()
+        {
+            var statementFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "original", "original.csv");
+
+            if (!System.IO.File.Exists(statementFilePath))
+            {
+                return BadRequest("Arquivos necessários não encontrados");
+            }
+
+            Spending spending = new Spending();
+            spending.Value = _BBService.ProcessMonthSpending(statementFilePath);
+
+            return Ok(spending);
         }
     }
 }

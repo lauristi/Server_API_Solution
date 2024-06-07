@@ -5,5 +5,8 @@
         string? ProcessStatment(string statementFilePath, string expenseFilePath, string finalFilePath);
 
         string ConvertCsvToXls(string csvFilePath, string xlsFilePath);
-    }
+
+        decimal ProcessMonthSpending(string statementFilePath);
+    }       
+        
 }
