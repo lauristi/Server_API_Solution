@@ -9,7 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server_API.Test", "Server_A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A850B391-B61B-4313-A865-C97AAFC27CB0}"
 	ProjectSection(SolutionItems) = preProject
+		GitDocs\BlazorInterface.PNG = GitDocs\BlazorInterface.PNG
+		GitDocs\Esquema.png = GitDocs\Esquema.png
 		Jenkinsfile = Jenkinsfile
+		GitDocs\README.md = GitDocs\README.md
 	EndProjectSection
 EndProject
 Global
