@@ -59,8 +59,6 @@ namespace Server_API.Service
                 string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1);
 
                 int cabecalho = 0;
-                //string csvName = null;
-
                 string? xlsName = null;
 
                 foreach (string line in lines)
@@ -93,7 +91,6 @@ namespace Server_API.Service
 
                         if (string.IsNullOrEmpty(xlsName))
                         {
-                            //csvName = CreateArchiveName(statementData.Date, "csv");
                             xlsName = CreateArchiveName(statementData.Date, "xlsx");
                         }
                     }
@@ -102,7 +99,7 @@ namespace Server_API.Service
                     cabecalho++;
                 }
 
-                //string csvFilePath = Path.Combine(finalFilePath, csvName);
+
                 xlsName = xlsName ?? "";
                 string xlsFilePath = Path.Combine(finalFilePath, xlsName);
 
@@ -114,15 +111,6 @@ namespace Server_API.Service
                 {
                     return null;
                 }
-
-                //if (CreateNewFileCSV(finalFilePath, statementDatas))
-                //{
-                //    return ConvertCsvToXls(csvFilePath, xlsFilePath); ;
-                //}
-                //else
-                //{
-                //    return null;
-                //};
             }
             catch (Exception)
             {

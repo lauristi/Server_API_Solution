@@ -11,16 +11,12 @@
    </ItemGroup>-->
 
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="7.1.3" />
-    <PackageReference Include="MimeKit" Version="4.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="EncryptionLib">
-      <HintPath>Encryptionlib\EncryptionLib.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Server_API.Domain\Server_API.Domain.csproj" />
   </ItemGroup>
 
 </Project>
