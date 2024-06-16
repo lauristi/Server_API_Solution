@@ -1,8 +1,12 @@
-﻿namespace Server_API.Service.Interface
+﻿using Server_API.Domain.Model.BB;
+
+namespace Server_API.Service.Interface
 {
     public interface IBBService
     {
         string? ProcessStatment(string statementFilePath, string expenseFilePath, string finalFilePath);
+
+        ProcessedData ProcessBBStatment(string statementFilePath, string expenseFilePath, string finalFilePath);
 
         string ConvertCsvToXls(string csvFilePath, string xlsFilePath);
 

@@ -1,4 +1,5 @@
-﻿using Server_API.Domain.Service.Interface;
+﻿using Server_API.Domain.Infrastructure.Interface;
+using Server_API.Domain.Service.Interface;
 
 namespace Server_API.Domain.Service
 {

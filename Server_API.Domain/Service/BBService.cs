@@ -1,5 +1,6 @@
 ﻿using OfficeOpenXml;
-using Server_API.Model;
+using Server_API.Domain.Model.BB;
+using Server_API.Domain.Model.BB.BLL;
 using Server_API.Service.Interface;
 using System.Globalization;
 using System.Text;
@@ -99,7 +100,6 @@ namespace Server_API.Service
                     cabecalho++;
                 }
 
-
                 xlsName = xlsName ?? "";
                 string xlsFilePath = Path.Combine(finalFilePath, xlsName);
 
@@ -110,6 +110,85 @@ namespace Server_API.Service
                 else
                 {
                     return null;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public ProcessedData ProcessBBStatment(string statementFilePath, string expenseFilePath, string finalFilePath)
+        {
+            try
+            {
+                ProcessedData processedData = new ProcessedData();
+
+                //01 CARREGO A LISTA DE DESPESAS
+                List<Expense> expenses = LoadConversions(expenseFilePath);
+
+                //02 CARREGO OS DADOS DO EXTRATO
+                List<StatementData> statementDatas = new List<StatementData>();
+
+                string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1);
+
+                int cabecalho = 0;
+                string? xlsName = null;
+
+                foreach (string line in lines)
+                {
+                    //--0---------1-----------------2-------------3--------------------4----------------5----
+                    //Data","Dependencia Origem","Histórico","Data do Balancete","Número do documento","Valor",
+
+                    StatementData statementData = new StatementData();
+
+                    if (cabecalho == 0)
+                    {
+                        statementData.Date = "DATA";
+                        statementData.Subject = "CASA";
+                        statementData.Value = "VALOR";
+                        statementData.Type = "TIPO";
+                        statementData.Score = "SCORE";
+                    }
+                    else
+                    {
+                        string cleanLine = line.Replace("\"", "");
+                        string[] aItem = cleanLine.Split(',');
+                        statementData.Date = aItem[0];
+                        statementData.Subject = aItem[2].ToUpper();
+                        statementData.Value = NormalizeValue(aItem[5]);
+                        statementData.Score = ExpenseAnalysis(statementData.Value);
+                        statementData.IsCredit = !aItem[5].Contains("-");
+
+                        statementData.Type = ProcessSubject(statementData, expenses);
+                        //------------------------------------------------------
+
+                        if (string.IsNullOrEmpty(xlsName))
+                        {
+                            xlsName = CreateArchiveName(statementData.Date, "xlsx");
+                        }
+                    }
+
+                    statementDatas.Add(statementData);
+                    cabecalho++;
+                }
+
+                xlsName = xlsName ?? "";
+                string xlsFilePath = Path.Combine(finalFilePath, xlsName);
+
+                if (CreateNewFileXLS(xlsFilePath, statementDatas))
+                {
+                    processedData.SuperMarket = 1.0m;
+                    processedData.Pharmacy = 2.0m;
+                    processedData.Total = 3.0m;
+                    //--------------------------------------
+                    processedData.FilePath = xlsFilePath;
+
+                    return processedData;
+                }
+                else
+                {
+                    return processedData;
                 }
             }
             catch (Exception)

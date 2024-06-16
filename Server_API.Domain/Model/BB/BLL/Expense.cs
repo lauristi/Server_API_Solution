@@ -1,4 +1,4 @@
-﻿namespace Server_API.Model
+﻿namespace Server_API.Domain.Model.BB.BLL
 {
     public class Expense
     {

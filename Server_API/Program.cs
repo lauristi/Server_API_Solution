@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Server_API.Domain.Infrastructure.EncryptionLib;
+using Server_API.Domain.Infrastructure.Interface;
 using Server_API.Domain.Service;
 using Server_API.Domain.Service.Interface;
+using Server_API.Infrastructure.Mapper;
 using Server_API.Service;
 using Server_API.Service.Interface;
 using System.Globalization;
@@ -39,12 +42,13 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 //Serviços do Dominio
+builder.Services.AddSingleton<ICrypto, Crypto>();
 builder.Services.AddSingleton<IEncryptionService, EncryptionService>();
+
 builder.Services.AddScoped<IBBService, BBService>();
 
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

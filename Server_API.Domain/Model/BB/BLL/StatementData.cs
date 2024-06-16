@@ -1,12 +1,12 @@
-﻿namespace Server_API.Model
+﻿namespace Server_API.Domain.Model.BB.BLL
 {
     public class StatementData
     {
-        public String? Date { get; set; }
-        public String? Subject { get; set; }
+        public string? Date { get; set; }
+        public string? Subject { get; set; }
 
-        public String? Type { get; set; }
-        public String? Score { get; set; }
+        public string? Type { get; set; }
+        public string? Score { get; set; }
         public bool IsCredit { get; set; }
 
         //Evita aviso chato de null
