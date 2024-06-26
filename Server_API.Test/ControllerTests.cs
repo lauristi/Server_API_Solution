@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Server_API.Controllers;
-using Server_API.Domain.Service.Interface;
+using Server_API.Domain.Service.InfrastrutureService.Interface;
 using Server_API.Model.clipboard;
 
 namespace Server_API.Tests

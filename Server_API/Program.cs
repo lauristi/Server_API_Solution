@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Server_API.Domain.Infrastructure.EncryptionLib;
 using Server_API.Domain.Infrastructure.Interface;
-using Server_API.Domain.Service;
-using Server_API.Domain.Service.Interface;
+using Server_API.Domain.Service.BBService;
+using Server_API.Domain.Service.BBService.Interface;
+using Server_API.Domain.Service.InfrastrutureService;
+using Server_API.Domain.Service.InfrastrutureService.Interface;
 using Server_API.Infrastructure.Mapper;
-using Server_API.Service;
-using Server_API.Service.Interface;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,8 +46,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ICrypto, Crypto>();
 builder.Services.AddSingleton<IEncryptionService, EncryptionService>();
 
-builder.Services.AddScoped<IBBService, BBService>();
+builder.Services.AddScoped<INormalizeService, NormalizeService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
+builder.Services.AddScoped<IBBService, BBService>();
+builder.Services.AddScoped<IXlsService, XlsService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();

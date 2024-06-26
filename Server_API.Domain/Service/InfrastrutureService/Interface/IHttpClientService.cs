@@ -1,4 +1,4 @@
-﻿namespace Server_API.Domain.Service.Interface
+﻿namespace Server_API.Domain.Service.InfrastrutureService.Interface
 {
     public interface IHttpClientService
     {

@@ -1,7 +1,7 @@
 ﻿using Server_API.Domain.Infrastructure.Interface;
-using Server_API.Domain.Service.Interface;
+using Server_API.Domain.Service.InfrastrutureService.Interface;
 
-namespace Server_API.Domain.Service
+namespace Server_API.Domain.Service.InfrastrutureService
 {
     public class EncryptionService : IEncryptionService
     {
