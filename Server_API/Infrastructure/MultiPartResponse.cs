@@ -12,6 +12,7 @@
         public decimal TotalCredit { get; set; }
 
         //------------------------------------------
+        public String FileName { get; set; }
         public byte[] FileContent { get; set; }
     }
 }

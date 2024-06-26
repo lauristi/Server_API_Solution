@@ -129,8 +129,9 @@ namespace Server_API.Controllers
                         Extra = recoveredData.Extra,
                         TotalDebit = recoveredData.TotalDebit,
                         TotalCredit = recoveredData.TotalCredit,
+                        FileName = Path.GetFileName(recoveredData.FilePath),
                         FileContent = System.IO.File.ReadAllBytes(recoveredData.FilePath)
-                    };
+                    }; 
 
                     // Retorno
                     return Ok(multiPartResponse);
