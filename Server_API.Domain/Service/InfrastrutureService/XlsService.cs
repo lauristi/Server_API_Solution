@@ -78,13 +78,15 @@ namespace Server_API.Domain.Service.InfrastrutureService
                     package.Compatibility.IsWorksheets1Based = true;
 
                     ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
-                    int row = 1;
+
+                    int linhaInicial = 1;
+                    int row = linhaInicial;
 
                     foreach (SpendingData field in spendingData)
                     {
                         worksheet.Cells[row, 1].Value = field.Date;
                         worksheet.Cells[row, 2].Value = field.Subject;
-                        worksheet.Cells[row, 3].Value = field.DecimalValue;
+                        worksheet.Cells[row, 3].Value = field.StringValue;
                         worksheet.Cells[row, 4].Value = field.Type;
                         worksheet.Cells[row, 5].Value = field.Score;
 
@@ -98,7 +100,8 @@ namespace Server_API.Domain.Service.InfrastrutureService
 
                     // Definir formato da coluna 3 como moeda brasileira sem o símbolo de moeda
                     // linha inicial, coluna inicial, linha(s) finais, coluna final
-                    var colC = worksheet.Cells[1, 3, row - 1, 3];
+                    // LINHA DOIS POIS LINHA 1 É CAB
+                    var colC = worksheet.Cells[linhaInicial, 3, row - 1, 3];
                     colC.Style.Numberformat.Format = "#,##0.00"; // Formato sem símbolo de moeda
 
                     package.Save();
