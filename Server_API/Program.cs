@@ -15,6 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
+
+var configuration = builder.Configuration;
+
+var apiBaseAddress = configuration["ConnectionSettings:ApiBaseAddress"];
+var bindAddress = configuration["ConnectionSettings:BindAddress"];
+var bindPort = int.Parse(configuration["ConnectionSettings:BindPort"] ?? "5020");
+
 //==============================================================================================
 // Configure o Kestrel para ouvir em todas as interfaces de rede na porta 5020
 //==============================================================================================
@@ -23,7 +30,7 @@ if (!builder.Environment.IsDevelopment())
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.Listen(System.Net.IPAddress.Parse("192.168.0.156"), 5020);
+        options.Listen(System.Net.IPAddress.Parse(bindAddress), bindPort);
     });
 }
 //==============================================================================================
