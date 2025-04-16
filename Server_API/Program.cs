@@ -18,6 +18,7 @@ builder.Logging.AddConsole();
 
 var configuration = builder.Configuration;
 
+//APPSETTINGS
 var apiBaseAddress = configuration["ConnectionSettings:ApiBaseAddress"];
 var bindAddress = configuration["ConnectionSettings:BindAddress"];
 var bindPort = int.Parse(configuration["ConnectionSettings:BindPort"] ?? "5020");
