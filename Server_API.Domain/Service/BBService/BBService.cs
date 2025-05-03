@@ -115,6 +115,8 @@ namespace Server_API.Domain.Service.BBService
         {
             if (spendingData.Subject != null)
             {
+                string? result = null;
+                
                 if (spendingData.IsCredit)
                 {
                     //===============================================================================================================================
@@ -131,14 +133,19 @@ namespace Server_API.Domain.Service.BBService
                     {
                         spendingData.FinancialType = FINANCIAL_TYPE.IGNORE;
                     }
+
+                    // Se encontrar um elemento que corresponde à condição, retorna o valor do campo Owner da despesa correspondente
+                    var found = expenses.FirstOrDefault(e => e.Origin != null
+                                                    && spendingData.Subject.IndexOf(e.Origin, StringComparison.OrdinalIgnoreCase) >= 0);
+                    result = found?.Owner;
+                    spendingData.Type = result;
                 }
                 else
                 {
                     //===============================================================================================================================
                     // DEBITO
                     //===============================================================================================================================
-                    string? result = null;
-
+                    
                     // Alguns items negativos devem ser ignorados pois sao movimentacao interna
                     List<string> termList = new List<string> { "Aplicação", "Ágil", "Transferido", "Saldo", "S A L D O", "Enviada" };
                     bool aplicacao = termList.Any(term => spendingData.Subject.Contains(term.ToUpper()));
