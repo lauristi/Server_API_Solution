@@ -1,7 +1,7 @@
 ﻿using Server_API.Domain.Model.BB.BLL;
-using Server_API.Domain.Service.BBService.Interface;
+using Server_API.Domain.Service.ExpenseService.Inrterface;
 
-namespace Server_API.Domain.Service.BBService
+namespace Server_API.Domain.Service.ExpenseService
 {
     public class ExpenseService : IExpenseService
     {

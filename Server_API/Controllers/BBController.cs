@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Server_API.Domain.Service.BBService.Interface;
+using Server_API.Domain.Service.BankService.Interface;
 using Server_API.Infrastructure;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -10,15 +10,15 @@ namespace Server_API.Controllers
     public class BBController : Controller
     {
         private readonly IMapper _mapper;
-        private readonly IBBService _BBService;
+        private readonly IBankService _BankService;
         private readonly ILogger<BBController> _logger;
 
         public BBController(IMapper mapper,
-                            IBBService BBService,
+                            IBankService BankService,
                             ILogger<BBController> logger)
         {
             _mapper = mapper;
-            _BBService = BBService;
+            _BankService = BankService;
             _logger = logger;
         }
 
@@ -111,7 +111,7 @@ namespace Server_API.Controllers
                 }
 
                 // Processa dados da Origem e disponibiliza arquivo para download
-                var processedData = _BBService.ProcessBBStatment(statementFilePath, expenseFilePath, finalFilePath);
+                var processedData = _BankService.ProcessRawBankDetails(statementFilePath, expenseFilePath, finalFilePath);
 
                 // Mapeia para o tipo esperado no projeto
                 var recoveredData = _mapper.Map<Server_API.Infrastructure.RecoveredData>(processedData);
@@ -131,7 +131,7 @@ namespace Server_API.Controllers
                         TotalCredit = recoveredData.TotalCredit,
                         FileName = Path.GetFileName(recoveredData.FilePath),
                         FileContent = System.IO.File.ReadAllBytes(recoveredData.FilePath)
-                    }; 
+                    };
 
                     // Retorno
                     return Ok(multiPartResponse);
@@ -168,7 +168,7 @@ namespace Server_API.Controllers
 
         //        // Processa dados da Origem e disponibiliza arquivo para download
 
-        //        var processedData = _BBService.ProcessBBStatment(statementFilePath, expenseFilePath, finalFilePath);
+        //        var processedData = _BankService.ProcessBBStatment(statementFilePath, expenseFilePath, finalFilePath);
 
         //        // Mapeia para o tipo esperado no projeto
         //        RecoveredData recoveredData = new RecoveredData();
@@ -224,7 +224,7 @@ namespace Server_API.Controllers
         //        }
 
         //        //02 Processa dados da Origem e disponibiliza arquivo para download
-        //        finalFilePath = _BBService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
+        //        finalFilePath = _BankService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
 
         //        if (string.IsNullOrEmpty(finalFilePath))
         //        {
@@ -265,7 +265,7 @@ namespace Server_API.Controllers
         //        }
 
         //        // Processa dados da Origem e disponibiliza arquivo para download
-        //        finalFilePath = _BBService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
+        //        finalFilePath = _BankService.ProcessStatment(statementFilePath, expenseFilePath, finalFilePath);
 
         //        if (string.IsNullOrEmpty(finalFilePath))
         //        {

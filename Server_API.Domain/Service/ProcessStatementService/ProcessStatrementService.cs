@@ -1,20 +1,19 @@
 ﻿using Server_API.Domain.Model.BB;
 using Server_API.Domain.Model.BB.BLL;
 using Server_API.Domain.Model.BB.Spending;
-using Server_API.Domain.Service.BBService.Interface;
+using Server_API.Domain.Service.ExpenseService.Inrterface;
 using Server_API.Domain.Service.InfrastrutureService.Interface;
-using System.Text;
 using static Server_API.Domain.Model.BB.Enumeradores;
 
-namespace Server_API.Domain.Service.BBService
+namespace Server_API.Domain.Service.ProcessStatementService
 {
-    public class BBService : IBBService
+    public class ProcessStatrementService : Interface.IProcessStatementService
     {
         private readonly IExpenseService _expenseService;
         private readonly IXlsService _xlsService;
         private readonly INormalizeService _normalizeService;
 
-        public BBService(IExpenseService expenseService,
+        public ProcessStatrementService(IExpenseService expenseService,
                          IXlsService xlsService,
                          INormalizeService normalizeService
                          )
@@ -24,99 +23,12 @@ namespace Server_API.Domain.Service.BBService
             _normalizeService = normalizeService;
         }
 
-        public ProcessedData ProcessBBStatment(string statementFilePath, string expenseFilePath, string finalFilePath)
-        {
-            try
-            {
-                ProcessedData processedData = new ProcessedData();
-
-                //01 CARREGO A LISTA DE DESPESAS CONHECIDAS
-                List<Expense> expenses = _expenseService.LoadExpensesList(expenseFilePath);
-
-                //02 CARREGO OS DADOS DO EXTRATO
-                List<SpendingData> spendingDataList = new List<SpendingData>();
-
-                string[] lines = File.ReadAllLines(statementFilePath, Encoding.Latin1);
-
-                int cabecalho = 0;
-                string? xlsName = null;
-
-                foreach (string line in lines)
-                {
-                    //--0---------1-----------------2-------------3--------------------4----------------5----
-                    //Data","Dependencia Origem","Histórico","Data do Balancete","Número do documento","Valor",
-
-                    SpendingData spendingData = new SpendingData();
-
-                    if (cabecalho == 0)
-                    {
-                        spendingData.Date = "DATA";
-                        spendingData.Subject = "CASA";
-                        spendingData.StringValue = "VALOR";
-                        spendingData.Type = "TIPO";
-                        spendingData.Score = "SCORE";
-                    }
-                    else
-                    {
-                        string cleanLine = line.Replace("\"", "");
-                        string[] aItem = cleanLine.Split(',');
-
-                        spendingData.Date = aItem[0];
-                        spendingData.Subject = aItem[2].ToUpper();
-
-                        spendingData.GrossValue = aItem[5];
-                        spendingData.StringValue = _normalizeService.NormalizeValue(aItem[5]);
-                        spendingData.DecimalValue = _normalizeService.NormalizeToDecimal(spendingData.StringValue);
-                        spendingData.IsCredit = !aItem[5].Contains("-");
-
-                        spendingData = ProcessSubject(spendingData, expenses);
-
-                        //------------------------------------------------------
-
-                        if (string.IsNullOrEmpty(xlsName))
-                        {
-                            xlsName = _xlsService.CreateXlsArchiveName(spendingData.Date, "xlsx");
-                        }
-                    }
-
-                    spendingDataList.Add(spendingData);
-                    cabecalho++;
-                }
-
-                //--------------------------------------------------------------------------
-                // PROCESSA DESPESAS FIXAS E SOMADORES
-                //--------------------------------------------------------------------------
-
-                processedData = ProcessTotalKnowSpending(spendingDataList);
-
-                //--------------------------------------------------------------------------
-                //cria xls
-                //--------------------------------------------------------------------------
-                xlsName = xlsName ?? "";
-                string xlsFilePath = Path.Combine(finalFilePath, xlsName);
-
-                if (_xlsService.CreateNewFileXLS(xlsFilePath, spendingDataList))
-                {
-                    processedData.FilePath = xlsFilePath;
-                    return processedData;
-                }
-                else
-                {
-                    return processedData;
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private SpendingData ProcessSubject(SpendingData spendingData, List<Expense> expenses)
+        public SpendingData ProcessSubject(SpendingData spendingData, List<Expense> expenses)
         {
             if (spendingData.Subject != null)
             {
                 string? result = null;
-                
+
                 if (spendingData.IsCredit)
                 {
                     //===============================================================================================================================
@@ -145,7 +57,7 @@ namespace Server_API.Domain.Service.BBService
                     //===============================================================================================================================
                     // DEBITO
                     //===============================================================================================================================
-                    
+
                     // Alguns items negativos devem ser ignorados pois sao movimentacao interna
                     List<string> termList = new List<string> { "Aplicação", "Ágil", "Transferido", "Saldo", "S A L D O", "Enviada" };
                     bool aplicacao = termList.Any(term => spendingData.Subject.Contains(term.ToUpper()));
@@ -206,7 +118,7 @@ namespace Server_API.Domain.Service.BBService
             return spendingData;
         }
 
-        private ProcessedData ProcessTotalKnowSpending(List<SpendingData> spendingDataList)
+        public ProcessedData ProcessTotalKnowSpending(List<SpendingData> spendingDataList)
         {
             ProcessedData processedData = new ProcessedData();
 

@@ -2,10 +2,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Server_API.Domain.Infrastructure.EncryptionLib;
 using Server_API.Domain.Infrastructure.Interface;
-using Server_API.Domain.Service.BBService;
-using Server_API.Domain.Service.BBService.Interface;
+using Server_API.Domain.Service.BankService;
+using Server_API.Domain.Service.BankService.Interface;
+using Server_API.Domain.Service.ExpenseService;
+using Server_API.Domain.Service.ExpenseService.Inrterface;
 using Server_API.Domain.Service.InfrastrutureService;
 using Server_API.Domain.Service.InfrastrutureService.Interface;
+using Server_API.Domain.Service.ProcessStatementService;
+using Server_API.Domain.Service.ProcessStatementService.Interface;
 using Server_API.Infrastructure.Mapper;
 using System.Globalization;
 
@@ -14,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 //Set log
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
 
 var configuration = builder.Configuration;
 
@@ -37,7 +40,7 @@ if (!builder.Environment.IsDevelopment())
 //==============================================================================================
 
 // Add services to the container.
-builder.Services.AddScoped<IBBService, BBService>();
+builder.Services.AddScoped<IBankService, BankService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -57,7 +60,9 @@ builder.Services.AddSingleton<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<INormalizeService, NormalizeService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
-builder.Services.AddScoped<IBBService, BBService>();
+builder.Services.AddScoped<IProcessStatementService, ProcessStatrementService>();
+
+builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<IXlsService, XlsService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

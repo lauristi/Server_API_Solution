@@ -1,4 +1,5 @@
 ﻿using Server_API.Domain.Model.BB.Spending;
+using Server_API.Domain.Service.Enums;
 
 namespace Server_API.Domain.Service.InfrastrutureService.Interface
 {
@@ -10,6 +11,6 @@ namespace Server_API.Domain.Service.InfrastrutureService.Interface
 
         bool CreateNewFileXLS(string xlsFilePath, List<SpendingData> spendingData);
 
-        string CreateXlsArchiveName(string dateString, string extension);
+        string CreateXlsArchiveName(BankType bankType, string dateString, string extension);
     }
 }

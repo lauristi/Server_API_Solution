@@ -1,8 +1,10 @@
 ﻿using OfficeOpenXml;
 using Server_API.Domain.Model.BB.Spending;
+using Server_API.Domain.Service.Enums;
 using Server_API.Domain.Service.InfrastrutureService.Interface;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks.Dataflow;
 
 namespace Server_API.Domain.Service.InfrastrutureService
 {
@@ -114,16 +116,25 @@ namespace Server_API.Domain.Service.InfrastrutureService
             }
         }
 
-        public string CreateXlsArchiveName(string dateString, string extension)
+        public string CreateXlsArchiveName(BankType bankType, string dateString, string extension)
         {
             if (DateTime.TryParseExact(dateString, "dd/MM/yyyy", CultureInfo.InvariantCulture,
                                                                  DateTimeStyles.None,
                                                                  out DateTime dateTime))
             {
-                //A Primeira linha é os Saldo do mês anterior.
-                dateTime = dateTime.AddMonths(1);
+                string bank;
+                if (bankType == BankType.BB)
+                {
+                    //A Primeira linha é os Saldo do mês anterior.
+                    dateTime = dateTime.AddMonths(1);
+                    bank = "BB";
+                }
+                else {
+                    bank = "NU";
+                }
 
-                return $"{dateTime.Month:00}-{dateTime.ToString("MMMM").ToUpper()}-{dateTime.ToString("yyyy")}.{extension}";
+
+                return $"{bank}-{dateTime.Month:00}-{dateTime.ToString("MMMM").ToUpper()}-{dateTime.ToString("yyyy")}.{extension}";
             }
 
             return "00 MONTH.csv";

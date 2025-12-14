@@ -1,6 +1,6 @@
 ﻿using Server_API.Domain.Model.BB.BLL;
 
-namespace Server_API.Domain.Service.BBService.Interface
+namespace Server_API.Domain.Service.ExpenseService.Inrterface
 {
     public interface IExpenseService
     {
