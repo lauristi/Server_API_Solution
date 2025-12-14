@@ -6,7 +6,6 @@ using Server_API.Domain.Service.Enums;
 using Server_API.Domain.Service.ExpenseService.Inrterface;
 using Server_API.Domain.Service.InfrastrutureService.Interface;
 using Server_API.Domain.Service.ProcessStatementService.Interface;
-using System;
 using System.Globalization;
 using System.Text;
 
@@ -64,6 +63,9 @@ namespace Server_API.Domain.Service.BankService
                 {
                     SpendingData spendingDataItem = new SpendingData();
 
+                    string cleanLine = line.Replace("\"", "");
+                    string[] aItem = cleanLine.Split(line.Contains(";") ? ';' : ',');
+
                     if (cabecalho == 0)
                     {
                         //02.01 DETERMINA O BANCO & DEFINE CABEÇALHO PADRÃO
@@ -76,14 +78,11 @@ namespace Server_API.Domain.Service.BankService
                         //------0--1--------2---
                         //date";"title";"amount"
 
-                        string cleanCab = line.Replace("\"", "");
-                        string[] aItem = cleanCab.Split(';');
+                        //string cleanCab = line.Replace("\"", "");
+                        //string[] aItem = cleanCab.Split(line.Contains(";") ? ';' : ',');
 
-                        if (aItem[0].StartsWith("DATA", StringComparison.OrdinalIgnoreCase))
-                        {
-                            bank = BankType.BB;
-                        }
-                        else
+                        bank = BankType.BB;
+                        if (aItem[0].StartsWith("DATE", StringComparison.OrdinalIgnoreCase))
                         {
                             bank = BankType.Nubank;
                         }
@@ -96,9 +95,6 @@ namespace Server_API.Domain.Service.BankService
                     }
                     else
                     {
-                        string cleanLine = line.Replace("\"", "");
-                        string[] aItem = cleanLine.Split(';');
-
                         if (bank == BankType.BB)
                         {
                             spendingDataItem.Date = aItem[0];
@@ -158,8 +154,7 @@ namespace Server_API.Domain.Service.BankService
                 }
 
                 #endregion CRIACAO DO XLS FINAL
-
-    }
+            }
             catch (Exception)
             {
                 return null;
@@ -176,6 +171,5 @@ namespace Server_API.Domain.Service.BankService
                                            DateTimeStyles.None,
                                           out var date) ? date.ToString("dd/MM/yyyy") : null;
         }
-
     }
 }
