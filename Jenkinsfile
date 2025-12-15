@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        ASPNETCORE_ENVIRONMENT = 'Production' // <<< IMPORTANTE
         LOG_FILE = "pipeline.log"
         GIT_REPO = 'github.com/lauristi/Server_API_Solution.git'
         BRANCH = 'master'
@@ -27,7 +28,7 @@ pipeline {
         stage('01- Checkout') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'github-fine-token', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'github-fine-token-Secret', variable: 'GITHUB_TOKEN')]) {
                         sh """
                             git clone --depth 1 https://${GITHUB_TOKEN}@${GIT_REPO}
                             cd ${env.SOLUTION_PATH}

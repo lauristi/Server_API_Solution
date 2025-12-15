@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.HttpOverrides;
+﻿using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Server_API.Domain.Infrastructure.EncryptionLib;
 using Server_API.Domain.Infrastructure.Interface;
@@ -21,23 +21,31 @@ builder.Logging.AddConsole();
 
 var configuration = builder.Configuration;
 
-//APPSETTINGS
-var apiBaseAddress = configuration["ConnectionSettings:ApiBaseAddress"];
-var bindAddress = configuration["ConnectionSettings:BindAddress"];
-var bindPort = int.Parse(configuration["ConnectionSettings:BindPort"] ?? "5020");
+// URL da API externa (Server_API - porta 5020)
+var apiBaseAddress =
+    configuration["ConnectionSettings:ApiBaseAddress"]
+    ?? throw new InvalidOperationException(
+        "ConnectionSettings:ApiBaseAddress não configurado");
 
-//==============================================================================================
-// Configure o Kestrel para ouvir em todas as interfaces de rede na porta 5020
-//==============================================================================================
+// Porta do Frontend (ServerBB_Web)
+var bindPort =
+    int.Parse(configuration["ConnectionSettings:BindPort"] ?? "5020");
+
+// Kestrel
+// ✔️ Development: Visual Studio / launchSettings controlam
+// ✔️ Production: Kestrel escuta na porta configurada
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // escuta em todas as interfaces
+    options.ListenAnyIP(bindPort);
+});
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.Listen(System.Net.IPAddress.Parse(bindAddress), bindPort);
-    });
+    // Necessário após publish
+    builder.WebHost.UseStaticWebAssets();
 }
-//==============================================================================================
 
 // Add services to the container.
 builder.Services.AddScoped<IBankService, BankService>();
@@ -53,7 +61,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Servi�os do Dominio
+//Serviços do Dominio
 builder.Services.AddSingleton<ICrypto, Crypto>();
 builder.Services.AddSingleton<IEncryptionService, EncryptionService>();
 
@@ -109,4 +117,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 //==============================================================================================
 
 app.UseAuthentication();
+
+app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 app.Run();
